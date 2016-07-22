@@ -10,7 +10,7 @@ by Jason Geffner <jason.geffner@ngssecure.com> that can be found in the doc fold
 
 The repo contain a Visual Stodio 2010 buildable project. The repo containe a build version and executable is in:
 
-./exportrsa/Debug/exportrsa.exe
+https://github.com/luipir/ExportNotExportablePrivateKey/blob/master/exportrsa/Debug/exportrsa.exe
 
 How to use
 ~~~~~~~~~~
