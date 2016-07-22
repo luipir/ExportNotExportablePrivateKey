@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exportrsa", "exportrsa\exportrsa.vcxproj", "{CE476E99-3ED1-4B67-AD07-555A106F068A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE476E99-3ED1-4B67-AD07-555A106F068A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CE476E99-3ED1-4B67-AD07-555A106F068A}.Debug|Win32.Build.0 = Debug|Win32
+		{CE476E99-3ED1-4B67-AD07-555A106F068A}.Release|Win32.ActiveCfg = Release|Win32
+		{CE476E99-3ED1-4B67-AD07-555A106F068A}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
