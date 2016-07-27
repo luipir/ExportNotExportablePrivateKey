@@ -55,6 +55,8 @@ March 18, 2011 - v1.0 - First public release
 #include <WinCrypt.h>
 #include <stdio.h>
 
+#include <iostream>
+
 #pragma comment(lib, "crypt32.lib")
 #ifndef WINCE
 #pragma comment(lib, "ncrypt.lib")
@@ -84,7 +86,7 @@ CertEnumSystemStoreCallback(
                 pvSystemStore);
     if (NULL == hCertStore)
     {
-        fprintf(stderr, "Cannot open cert store. Skip it: %X\n", GetLastError());
+        //fprintf(stderr, "Cannot open cert store. Skip it: %X\n", GetLastError());
         return TRUE;
     }
 
@@ -96,35 +98,30 @@ CertEnumSystemStoreCallback(
          NULL != pCertContext;
          pCertContext = CertEnumCertificatesInStore(hCertStore, pCertContext))
     {
-		if (dwCertName)
-		{
-			free(dwCertName);
-		}
+        if (dwCertName)
+        {
+            free(dwCertName);
+        }
 
-        if(!(cbSize = CertGetNameString(   
-            pCertContext,   
-            CERT_NAME_SIMPLE_DISPLAY_TYPE,   
+        if(!(cbSize = CertGetNameString(
+            pCertContext,
+            CERT_NAME_SIMPLE_DISPLAY_TYPE,
             0,
-            NULL,   
-            NULL,   
+            NULL,
+            NULL,
             0)))
         {
-           fprintf(stderr, "CertGetName 1 failed.");
+           fprintf(stderr, "CertGetName size failed.");
         }
         dwCertName = (LPTSTR)malloc(cbSize * sizeof(TCHAR));
 
-        if(CertGetNameString(
+        if(!CertGetNameString(
             pCertContext,
             CERT_NAME_SIMPLE_DISPLAY_TYPE,
             0,
             NULL,
             dwCertName,
             cbSize))
-
-        {
-            //fprintf(stderr, "\nSubject -> %S.\n", dwCertName);
-        }
-        else
         {
             fprintf(stderr, "CertGetName failed.");
         }
@@ -137,7 +134,6 @@ CertEnumSystemStoreCallback(
             fprintf(stderr, "Skip cert with NO rsa public key for %S\n", dwCertName);
             continue;
         }
-        // END OF ADDED
 
         // Ensure that the certificate's private key is available
         DWORD dwKeySpec;
@@ -190,7 +186,7 @@ CertEnumSystemStoreCallback(
         if (CERT_NCRYPT_KEY_SPEC != dwKeySpec)
         {
             // This code path is for CryptoAPI
-            fprintf(stdout, "Key for %S use CryptoAPI\n", dwCertName);
+            //fprintf(stdout, "Key for %S use CryptoAPI\n", dwCertName);
 
             // Retrieve a handle to the certificate's private key
             if (!CryptGetUserKey(
@@ -202,19 +198,7 @@ CertEnumSystemStoreCallback(
                 continue;
             }
 
-            // Mark the certificate's private key as exportable and archivable
-            *(ULONG_PTR*)(*(ULONG_PTR*)(*(ULONG_PTR*)
-                #if defined(_M_X64)
-                    (hKey + 0x58) ^ 0xE35A172CD96214A0) + 0x0C)
-                #elif (defined(_M_IX86) || defined(_ARM_))
-                    (hKey + 0x2C) ^ 0xE35A172C) + 0x08)
-                #else
-                    #error Platform not supported
-                #endif
-                    |= CRYPT_EXPORTABLE | CRYPT_ARCHIVABLE;
-
-            // Export the private key
-            // first to retieve the lenght, then to retrieve data
+            // check if private key is exportable
             if (!CryptExportKey(
                       hKey,
                       NULL,
@@ -223,8 +207,45 @@ CertEnumSystemStoreCallback(
                       NULL,
                       &cbData))
             {
-                fprintf(stderr, "Cannot get private key lenght for for %S: %x\n", dwCertName, GetLastError() );
-                continue;
+                fprintf(stderr, "Private key for cert \"%S\" is not exportable: %x\n", dwCertName, GetLastError() );
+
+                // Ask permission to the user to export cert
+                fprintf(stdout, "Do you really want to export Public/private key for cert \"%S\"\n[Y|N] (default N) >>>> ", dwCertName );
+                char response = ' ';
+                std::cin.get(response);
+                std::cin.clear();
+                std::cin.sync();
+                //std::cin.ignore(10, '\n');
+                if ( response != 'Y' )
+                {
+                    fprintf(stdout, "Cert \"%S\" will be NOT exported\n\n", dwCertName );
+                    continue;
+                }
+
+                // Mark the certificate's private key as exportable and archivable
+                *(ULONG_PTR*)(*(ULONG_PTR*)(*(ULONG_PTR*)
+                    #if defined(_M_X64)
+                        (hKey + 0x58) ^ 0xE35A172CD96214A0) + 0x0C)
+                    #elif (defined(_M_IX86) || defined(_ARM_))
+                        (hKey + 0x2C) ^ 0xE35A172C) + 0x08)
+                    #else
+                        #error Platform not supported
+                    #endif
+                        |= CRYPT_EXPORTABLE | CRYPT_ARCHIVABLE;
+
+                // Export the private key
+                // first to retieve the lenght, then to retrieve data
+                if (!CryptExportKey(
+                          hKey,
+                          NULL,
+                          PRIVATEKEYBLOB,
+                          0,
+                          NULL,
+                          &cbData))
+                {
+                    fprintf(stderr, "Not able to get private key lenght for cert \"%S\": %x\n", dwCertName, GetLastError() );
+                    continue;
+                }
             }
             pbData = (BYTE*)malloc(cbData);
 
@@ -236,11 +257,11 @@ CertEnumSystemStoreCallback(
                       pbData,
                       &cbData))
             {
-                fprintf(stderr, "Cannot export private key for for %s: %S\n", dwCertName, GetLastError() );
+                fprintf(stderr, "Cannot export private key for for \"%S\": %x\n", dwCertName, GetLastError() );
                 continue;
             }
 
-            fprintf(stdout, "SUCCESS get private key for %S\n", dwCertName );
+            fprintf(stdout, "SUCCESS get private key for \"%S\"\n\n", dwCertName );
 
             // Establish a temporary key container
             if (!CryptAcquireContext(
@@ -263,14 +284,14 @@ CertEnumSystemStoreCallback(
                         CRYPT_EXPORTABLE,
                         &hKeyNew))
             {
-                fprintf(stderr, "Cannot import key in temporary key container to store key for %S: %x\n", dwCertName, GetLastError() );
+                fprintf(stderr, "Cannot import key in temporary key container to store key for \"%S\": %x\n", dwCertName, GetLastError() );
                 continue;
             }
         }
 #ifndef WINCE
         else
         {
-            fprintf(stdout, "Key for %S is a CNG key\n", dwCertName);
+            fprintf(stdout, "Key for \"%S\" is a CNG key\n", dwCertName);
 
             // This code path is for CNG
             // Retrieve a handle to the Service Control Manager
@@ -304,11 +325,11 @@ CertEnumSystemStoreCallback(
             DWORD dwOffsetNKey;
             DWORD dwOffsetSrvKeyInLsass;
             DWORD dwOffsetKspKeyInLsass;
-		#if defined(_M_X64)
+        #if defined(_M_X64)
             dwOffsetNKey = 0x10;
             dwOffsetSrvKeyInLsass = 0x28;
             dwOffsetKspKeyInLsass = 0x28;
-		#elif defined(_M_IX86)
+        #elif defined(_M_IX86)
             dwOffsetNKey = 0x08;
             if (!g_fWow64Process)
             {
@@ -320,10 +341,10 @@ CertEnumSystemStoreCallback(
                 dwOffsetSrvKeyInLsass = 0x28;
                 dwOffsetKspKeyInLsass = 0x28;
             }
-		#else
+        #else
             // Platform not supported
             continue;
-		#endif
+        #endif
             // Mark the certificate's private key as exportable
             DWORD pKspKeyInLsass;
             SIZE_T sizeBytes;
@@ -440,7 +461,7 @@ CertEnumSystemStoreCallback(
                     NULL,
                     NULL,
                     EXPORT_PRIVATE_KEYS | REPORT_NO_PRIVATE_KEY
-					| REPORT_NOT_ABLE_TO_EXPORT_PRIVATE_KEY);
+                    | REPORT_NOT_ABLE_TO_EXPORT_PRIVATE_KEY);
 
         // Prepare the PFX's file name
         wchar_t wszFileName[MAX_PATH];
@@ -501,7 +522,7 @@ int _tmain(int argc, _TCHAR* argv[])
                         &g_fWow64Process);
     }
     // Scan all system store locations
-	CertEnumSystemStoreLocation(
+    CertEnumSystemStoreLocation(
                 0,
                 NULL,
                 CertEnumSystemStoreLocationCallback);
