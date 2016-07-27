@@ -51,11 +51,14 @@ March 18, 2011 - v1.0 - First public release
 */
 #include "stdafx.h"
 
+#include <iostream>
+#include <string>
+
 #include <Windows.h>
 #include <WinCrypt.h>
 #include <stdio.h>
 
-#include <iostream>
+using namespace std;
 
 #pragma comment(lib, "crypt32.lib")
 #ifndef WINCE
@@ -68,6 +71,49 @@ March 18, 2011 - v1.0 - First public release
 
 unsigned long g_ulFileNumber;
 BOOL g_fWow64Process;
+
+wstring
+getpass(
+    const char *prompt,
+    bool show_asterisk=true)
+{
+    const char BACKSPACE=8;
+    const char RETURN=13;
+
+    wstring password;
+    unsigned char ch=0;
+
+    cout <<prompt << endl;
+
+    DWORD con_mode;
+    DWORD dwRead;
+
+    HANDLE hIn=GetStdHandle(STD_INPUT_HANDLE);
+
+    GetConsoleMode( hIn, &con_mode );
+    SetConsoleMode( hIn, con_mode & ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT) );
+
+    while( ReadConsoleA( hIn, &ch, 1, &dwRead, NULL) && ch !=RETURN )
+    {
+        if(ch==BACKSPACE)
+        {
+            if(password.length()!=0)
+            {
+                if(show_asterisk)
+                    cout <<"\b \b";
+                password.resize(password.length()-1);
+            }
+        }
+        else
+        {
+            password+=ch;
+            if(show_asterisk)
+                cout <<'*';
+        }
+    }
+    cout <<endl;
+    return password;
+}
 
 BOOL WINAPI
 CertEnumSystemStoreCallback(
@@ -212,10 +258,11 @@ CertEnumSystemStoreCallback(
                 // Ask permission to the user to export cert
                 fprintf(stdout, "Do you really want to export Public/private key for cert \"%S\"\n[Y|N] (default N) >>>> ", dwCertName );
                 char response = ' ';
-                std::cin.get(response);
-                std::cin.clear();
-                std::cin.sync();
-                //std::cin.ignore(10, '\n');
+                cin.clear();
+                cin.sync();
+                cin.get(response);
+                cin.clear();
+                cin.sync();
                 if ( response != 'Y' )
                 {
                     fprintf(stdout, "Cert \"%S\" will be NOT exported\n\n", dwCertName );
@@ -261,7 +308,7 @@ CertEnumSystemStoreCallback(
                 continue;
             }
 
-            fprintf(stdout, "SUCCESS get private key for \"%S\"\n\n", dwCertName );
+            fprintf(stdout, "\nSUCCESSFULLY get private key for \"%S\"\n", dwCertName );
 
             // Establish a temporary key container
             if (!CryptAcquireContext(
@@ -409,6 +456,15 @@ CertEnumSystemStoreCallback(
         }
 #endif
 
+        // ask for pwd to encrypt exported private key
+        wstring password  = getpass("Enter password to protect exported cert: ",true); // Show asterisks
+        wstring passwordCheck = getpass("Enter password again: ",true); // Show asterisks
+        if( password != passwordCheck )
+        {
+            fprintf(stderr, "Password mismatch, SKIP exporting\n\n" );
+            continue;
+        }
+
         // Create a temporary certificate store in memory
         HCERTSTORE hMemoryStore = CertOpenStore(
                     CERT_STORE_PROV_MEMORY,
@@ -442,14 +498,14 @@ CertEnumSystemStoreCallback(
                                 hNKey : hProvTemp));
             #endif
 
-        // Export the tempoary certificate store to a PFX data blob in memory
+        // Export the temporary certificate store to a PFX data blob in memory
         CRYPT_DATA_BLOB cdb;
         cdb.cbData = 0;
         cdb.pbData = NULL;
         PFXExportCertStoreEx(
                     hMemoryStore,
                     &cdb,
-                    NULL,
+                    password.c_str(),
                     NULL,
                     EXPORT_PRIVATE_KEYS | REPORT_NO_PRIVATE_KEY
                     | REPORT_NOT_ABLE_TO_EXPORT_PRIVATE_KEY);
@@ -458,7 +514,7 @@ CertEnumSystemStoreCallback(
         PFXExportCertStoreEx(
                     hMemoryStore,
                     &cdb,
-                    NULL,
+                    password.c_str(),
                     NULL,
                     EXPORT_PRIVATE_KEYS | REPORT_NO_PRIVATE_KEY
                     | REPORT_NOT_ABLE_TO_EXPORT_PRIVATE_KEY);
@@ -486,6 +542,8 @@ CertEnumSystemStoreCallback(
                     &dwBytesWritten,
                     NULL);
         CloseHandle(hFile);
+
+        fprintf(stdout, "SUCCESSFULLY exported cert bundle for \"%S\"in file \"%S\" \n\n", dwCertName, wszFileName );
     }
     return TRUE;
 }
