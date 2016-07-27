@@ -1,27 +1,24 @@
-﻿Build started 7/21/2016 12:45:27 PM.
+﻿Build started 7/27/2016 7:52:37 AM.
      1>Project "c:\Users\boundless\documents\visual studio 2010\Projects\exportrsa\exportrsa\exportrsa.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\exportrsa.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yc"StdAfx.h" /Fp"Debug\exportrsa.pch" /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
-         stdafx.cpp
+         All outputs are up-to-date.
          c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"Debug\exportrsa.pch" /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt exportrsa.cpp
          exportrsa.cpp
-     1>c:\users\boundless\documents\visual studio 2010\projects\exportrsa\exportrsa\exportrsa.cpp(449): warning C4996: 'swprintf': swprintf has been changed to conform with the ISO C standard, adding an extra character count parameter. To use traditional Microsoft swprintf, set _CRT_NON_CONFORMING_SWPRINTFS.
+     1>c:\users\boundless\documents\visual studio 2010\projects\exportrsa\exportrsa\exportrsa.cpp(526): warning C4996: 'swprintf': swprintf has been changed to conform with the ISO C standard, adding an extra character count parameter. To use traditional Microsoft swprintf, set _CRT_NON_CONFORMING_SWPRINTFS.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\swprintf.inl(85) : see declaration of 'swprintf'
        ManifestResourceCompile:
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\exportrsa.exe.embed.manifest.res" Debug\exportrsa_manifest.rc 
+         All outputs are up-to-date.
        Link:
          c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"c:\users\boundless\documents\visual studio 2010\Projects\exportrsa\Debug\exportrsa.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\exportrsa.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"c:\users\boundless\documents\visual studio 2010\Projects\exportrsa\Debug\exportrsa.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"c:\users\boundless\documents\visual studio 2010\Projects\exportrsa\Debug\exportrsa.lib" /MACHINE:X86 Debug\exportrsa.exe.embed.manifest.res
          Debug\exportrsa.obj
          Debug\stdafx.obj
        Manifest:
          C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Debug\exportrsa.exe.embed.manifest" /manifest Debug\exportrsa.exe.intermediate.manifest
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\exportrsa.exe.embed.manifest.res" Debug\exportrsa_manifest.rc 
+         All outputs are up-to-date.
        LinkEmbedManifest:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"c:\users\boundless\documents\visual studio 2010\Projects\exportrsa\Debug\exportrsa.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\exportrsa.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"c:\users\boundless\documents\visual studio 2010\Projects\exportrsa\Debug\exportrsa.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"c:\users\boundless\documents\visual studio 2010\Projects\exportrsa\Debug\exportrsa.lib" /MACHINE:X86 Debug\exportrsa.exe.embed.manifest.res
-         Debug\exportrsa.obj
-         Debug\stdafx.obj
+         All outputs are up-to-date.
          exportrsa.vcxproj -> c:\users\boundless\documents\visual studio 2010\Projects\exportrsa\Debug\exportrsa.exe
        FinalizeBuildStatus:
          Deleting file "Debug\exportrsa.unsuccessfulbuild".
@@ -30,4 +27,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.45
+Time Elapsed 00:00:02.41
