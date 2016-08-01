@@ -8,7 +8,7 @@ https://www.nccgroup.trust/globalassets/our-research/uk/whitepapers/exporting_no
 
 by Jason Geffner <jason.geffner@ngssecure.com> that can be found in the doc folder
 
-The repo contain a Visual Stodio 2010 buildable project. The repo contains a Debug and Release build versions. Executable are in:
+The repo contain a Visual Studio 2010 buildable project. The repo contains a Debug and Release build versions. Executable are in:
 
 DEBUG:   https://github.com/luipir/ExportNotExportablePrivateKey/blob/master/exportrsa/Debug/exportrsa.exe
 RELEASE: https://github.com/luipir/ExportNotExportablePrivateKey/blob/master/exportrsa/Release/exportrsa.exe
